@@ -9,8 +9,8 @@ file_economic_system = 'Exiobase_MR_HIOT_2011_v3_3_17_by_prod_tech.xlsb'
 file_extensions = 'MR_HIOT_2011_v3_3_17_extensions.xlsb'
 
 
-def load_pymrio_3_3_17(path, extension_category = 'Emiss'):
-    """ Loads version 3.3.17 of the mixed-unit Exiobase into a pyMRIO object
+def load_pxp_io(path, extension_category = 'Emiss', version='3.3.17'):
+    """ Loads the mixed-unit Exiobase IO into a pyMRIO object
 
     Args
     ----

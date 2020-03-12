@@ -13,7 +13,7 @@ Only applies to the symmetric input-output (HIOT) version 3.3.17 of Hybrid Exiob
 
 import mixedunit_pymrio_loader as ml
 
-io = ml.load_pymrio_3_3_17('path-to-data-directory')
+io = ml.load_pxp_io('path-to-data-directory', version='3.3.17')
 
 ```
 
