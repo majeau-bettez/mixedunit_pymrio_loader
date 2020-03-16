@@ -4,12 +4,12 @@ import pyxlsb
 import pymrio
 
 # Filenames
-file_mr_final_demand = 'MR_HFD_2011_v3_3_17.xlsb'
-file_economic_system = 'Exiobase_MR_HIOT_2011_v3_3_17_by_prod_tech.xlsb'
-file_extensions = 'MR_HIOT_2011_v3_3_17_extensions.xlsb'
+file_mr_final_demand = 'MR_HFD_2011_v3_3_17'
+file_economic_system = 'Exiobase_MR_HIOT_2011_v3_3_17_by_prod_tech'
+file_extensions = 'MR_HIOT_2011_v3_3_17_extensions'
 
 
-def load_pxp_io(path, extension_category = 'Emiss', version='3.3.17'):
+def load_pxp_io(path, extension_category = 'Emiss', version='3.3.17', file_format='xlsb'):
     """ Loads the mixed-unit Exiobase IO into a pyMRIO object
 
     Args
@@ -17,9 +17,12 @@ def load_pxp_io(path, extension_category = 'Emiss', version='3.3.17'):
 
     path : str
         Location of the directory
-
     extension_category: str
         Name of the environmental extension that we seek
+    version: str
+        So far, this loader is only specified for version 3.3.17
+    file_format: str ['xlsb' (default) | 'xlsx']
+        Read file as binary spreadsheet (requires `pyxlsb` installed), or as OfficeOpen XML spreadsheet
 
     Returns
     -------
@@ -31,25 +34,34 @@ def load_pxp_io(path, extension_category = 'Emiss', version='3.3.17'):
 
     path = Path(path)
 
+    if file_format == 'xlsb':
+        ext = '.' + file_format
+        engine = 'pyxlsb'
+    elif file_format == 'xlsx':
+        ext = '.' + file_format
+        engine = None
+
     # Read economic system
-    with pd.ExcelFile( path / file_economic_system, engine='pyxlsb') as f:
+    fullpath = Path(path, file_economic_system).with_suffix(ext)
+    with pd.ExcelFile( fullpath, engine=engine) as f:
         # Read in final demand
-        Y = pd.read_excel(f, engine='pyxlsb', sheet_name='FD', index_col=[0,1,2,3,4], header=[0,1,2,3])
+        Y = pd.read_excel(f, sheet_name='FD', index_col=[0,1,2,3,4], header=[0,1,2,3])
 
         # Read in economic exchanges
-        Z = pd.read_excel(f, engine='pyxlsb', sheet_name='HIOT', index_col=[0,1, 2, 3, 4], header=[0, 1, 2, 3])
+        Z = pd.read_excel(f, sheet_name='HIOT', index_col=[0,1, 2, 3, 4], header=[0, 1, 2, 3])
 
 
     # Read environmental extensions
-    with pd.ExcelFile(path / file_extensions, engine='pyxlsb') as f:
+    fullpath = Path(path, file_extensions).with_suffix(ext)
+    with pd.ExcelFile(fullpath, engine=engine) as f:
 
         # Read in total sectoral exchanges with the environment
-        F = pd.read_excel(f, engine='pyxlsb', sheet_name= extension_category + '_act', header=[0,1,2,3],
-                index_col=[0,2,1])
+        sheet_name = extension_category + '_act'
+        F = pd.read_excel(f, sheet_name=sheet_name, header=[0,1,2,3], index_col=[0,2,1])
 
         # Read household exchanges with the environment
-        FY = pd.read_excel(f, engine='pyxlsb', sheet_name=extension_category + '_FD', header=[0,1,2,3],
-                index_col=[0,2,1])
+        sheet_name = extension_category + '_FD'
+        FY = pd.read_excel(f, sheet_name=sheet_name, header=[0,1,2,3], index_col=[0,2,1])
 
 
 
